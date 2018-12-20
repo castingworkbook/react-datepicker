@@ -71,6 +71,7 @@ export default class Calendar extends React.Component {
     maxDate: PropTypes.object,
     minDate: PropTypes.object,
     monthsShown: PropTypes.number,
+    monthSelectedIn: PropTypes.number,
     onClickOutside: PropTypes.func.isRequired,
     onMonthChange: PropTypes.func,
     onYearChange: PropTypes.func,
@@ -118,6 +119,7 @@ export default class Calendar extends React.Component {
     return {
       onDropdownFocus: () => {},
       monthsShown: 1,
+      monthSelectedIn: 0,
       forceShowMonthNavigation: false,
       timeCaption: "Time",
       previousMonthButtonLabel: "Previous Month",
@@ -212,7 +214,8 @@ export default class Calendar extends React.Component {
     );
   };
 
-  handleDayClick = (day, event) => this.props.onSelect(day, event);
+  handleDayClick = (day, event, monthSelectedIn) =>
+    this.props.onSelect(day, event, monthSelectedIn);
 
   handleDayMouseEnter = day => this.setState({ selectingDate: day });
 
@@ -492,7 +495,8 @@ export default class Calendar extends React.Component {
 
     var monthList = [];
     for (var i = 0; i < this.props.monthsShown; ++i) {
-      var monthDate = addMonths(cloneDate(this.state.date), i);
+      var monthsToAdd = i - this.props.monthSelectedIn;
+      var monthDate = addMonths(cloneDate(this.state.date), monthsToAdd);
       var monthKey = `month-${i}`;
       monthList.push(
         <div
@@ -522,6 +526,7 @@ export default class Calendar extends React.Component {
             day={monthDate}
             dayClassName={this.props.dayClassName}
             onDayClick={this.handleDayClick}
+            orderInDisplay={i}
             onDayMouseEnter={this.handleDayMouseEnter}
             onMouseLeave={this.handleMonthMouseLeave}
             onWeekSelect={this.props.onWeekSelect}

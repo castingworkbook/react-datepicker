@@ -200,6 +200,12 @@ export default class DatePicker extends React.Component {
     ) {
       this.setPreSelection(this.props.selected);
     }
+    if (
+      this.state.monthSelectedIn !== undefined &&
+      prevProps.monthsShown !== this.props.monthsShown
+    ) {
+      this.setState({ monthSelectedIn: 0 });
+    }
     if (prevProps.highlightDates !== this.props.highlightDates) {
       this.setState({
         highlightDates: getHightLightDaysMap(this.props.highlightDates)
@@ -221,10 +227,10 @@ export default class DatePicker extends React.Component {
     this.props.openToDate
       ? newDate(this.props.openToDate)
       : this.props.selectsEnd && this.props.startDate
-        ? newDate(this.props.startDate)
-        : this.props.selectsStart && this.props.endDate
-          ? newDate(this.props.endDate)
-          : now(this.props.utcOffset);
+      ? newDate(this.props.startDate)
+      : this.props.selectsStart && this.props.endDate
+      ? newDate(this.props.endDate)
+      : now(this.props.utcOffset);
 
   calcInitialState = () => {
     const defaultPreSelection = this.getPreSelection();
@@ -234,8 +240,8 @@ export default class DatePicker extends React.Component {
       minDate && isBefore(defaultPreSelection, minDate)
         ? minDate
         : maxDate && isAfter(defaultPreSelection, maxDate)
-          ? maxDate
-          : defaultPreSelection;
+        ? maxDate
+        : defaultPreSelection;
     return {
       open: this.props.startOpen || false,
       preventFocus: false,
@@ -336,7 +342,7 @@ export default class DatePicker extends React.Component {
     }
   };
 
-  handleSelect = (date, event) => {
+  handleSelect = (date, event, monthSelectedIn) => {
     // Preventing onFocus event to fix issue
     // https://github.com/Hacker0x01/react-datepicker/issues/628
     this.setState({ preventFocus: true }, () => {
@@ -346,7 +352,7 @@ export default class DatePicker extends React.Component {
       );
       return this.preventFocusTimeout;
     });
-    this.setSelected(date, event);
+    this.setSelected(date, event, undefined, monthSelectedIn);
     if (!this.props.shouldCloseOnSelect || this.props.showTimeSelect) {
       this.setPreSelection(date);
     } else if (!this.props.inline) {
@@ -354,7 +360,7 @@ export default class DatePicker extends React.Component {
     }
   };
 
-  setSelected = (date, event, keepInput) => {
+  setSelected = (date, event, keepInput, monthSelectedIn) => {
     let changedDate = date;
 
     if (changedDate !== null && isDayDisabled(changedDate, this.props)) {
@@ -375,10 +381,8 @@ export default class DatePicker extends React.Component {
             second: getSecond(selected)
           });
         }
-        if (!this.props.inline) {
-          this.setState({
-            preSelection: changedDate
-          });
+        if (this.props.monthsShown > 1) {
+          this.setState({ monthSelectedIn: monthSelectedIn });
         }
       }
       this.props.onChange(changedDate, event);
@@ -567,6 +571,7 @@ export default class DatePicker extends React.Component {
         weekLabel={this.props.weekLabel}
         utcOffset={this.props.utcOffset}
         outsideClickIgnoreClass={outsideClickIgnoreClass}
+        monthSelectedIn={this.state.monthSelectedIn}
         fixedHeight={this.props.fixedHeight}
         monthsShown={this.props.monthsShown}
         onDropdownFocus={this.handleDropdownFocus}
@@ -604,8 +609,8 @@ export default class DatePicker extends React.Component {
       typeof this.props.value === "string"
         ? this.props.value
         : typeof this.state.inputValue === "string"
-          ? this.state.inputValue
-          : safeDateFormat(this.props.selected, this.props);
+        ? this.state.inputValue
+        : safeDateFormat(this.props.selected, this.props);
 
     return React.cloneElement(customInput, {
       [customInputRef]: input => {
