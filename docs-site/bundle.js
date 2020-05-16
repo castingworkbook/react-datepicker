@@ -43447,7 +43447,7 @@
                     }
                   );
                 }
-                if (_this.props.inline && _this.props.monthsShown > 1) {
+                if (_this.props.monthsShown > 1) {
                   _this.setState({ monthSelectedIn: monthSelectedIn });
                 }
               }
@@ -66168,8 +66168,6 @@
             )),
             _this)),
             (_this.handleDayClick = function(day, event) {
-              console.log("CLICKED ON DAY!!");
-              console.log(_this.props);
               if (_this.props.onDayClick) {
                 _this.props.onDayClick(day, event, _this.props.orderInDisplay);
               }
